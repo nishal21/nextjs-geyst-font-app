@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OtakuPulse Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background-color: #121212;
+      color: #eee;
+    }
+    h1 {
+      color: #ff4081;
+    }
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+    select, input[type="text"] {
+      width: 300px;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      border-radius: 4px;
+      border: none;
+    }
+    button {
+      margin-top: 1.5rem;
+      padding: 0.75rem 1.5rem;
+      background-color: #ff4081;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #e040fb;
+    }
+    .feature {
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>OtakuPulse Bot Dashboard</h1>
+  <form id="configForm">
+    <div class="feature">
+      <label for="dailyQuoteChannel">Daily Quote Channel ID:</label>
+      <input type="text" id="dailyQuoteChannel" name="dailyQuoteChannel" placeholder="Enter Discord Channel ID" />
+    </div>
+    <div class="feature">
+      <label for="trailerNotificationChannel">Trailer Notification Channel ID:</label>
+      <input type="text" id="trailerNotificationChannel" name="trailerNotificationChannel" placeholder="Enter Discord Channel ID" />
+    </div>
+    <div class="feature">
+      <label for="airingAlertsChannel">Airing Alerts Channel ID:</label>
+      <input type="text" id="airingAlertsChannel" name="airingAlertsChannel" placeholder="Enter Discord Channel ID" />
+    </div>
+    <button type="submit">Save Configuration</button>
+  </form>
+
+  <script>
+    async function loadConfig() {
+      try {
+        const res = await fetch('/api/config');
+        if (res.ok) {
+          const config = await res.json();
+          document.getElementById('dailyQuoteChannel').value = config.dailyQuoteChannel || '';
+          document.getElementById('trailerNotificationChannel').value = config.trailerNotificationChannel || '';
+          document.getElementById('airingAlertsChannel').value = config.airingAlertsChannel || '';
+        }
+      } catch (error) {
+        console.error('Failed to load config:', error);
+      }
+    }
+
+    async function saveConfig(event) {
+      event.preventDefault();
+      const config = {
+        dailyQuoteChannel: document.getElementById('dailyQuoteChannel').value.trim(),
+        trailerNotificationChannel: document.getElementById('trailerNotificationChannel').value.trim(),
+        airingAlertsChannel: document.getElementById('airingAlertsChannel').value.trim(),
+      };
+      try {
+        const res = await fetch('/api/config', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(config),
+        });
+        if (res.ok) {
+          alert('Configuration saved successfully!');
+        } else {
+          alert('Failed to save configuration.');
+        }
+      } catch (error) {
+        alert('Error saving configuration.');
+        console.error(error);
+      }
+    }
+
+    document.getElementById('configForm').addEventListener('submit', saveConfig);
+    loadConfig();
+  </script>
+</body>
+</html>
